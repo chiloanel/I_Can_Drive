@@ -1,0 +1,12 @@
+ALGORITHM FOR ONE ULTRASONIC SENSOR POSITIONED AT THE FRONT OF THE CAR.
+
+1. Turn Ultrasonic Sensor on.
+2. If object is detected.
+- Brake.
+- Turn left and reverse for object distance.
+3. If objcet is not detected and reverse is complete.
+- Brake.
+- Turn right and accelerate forward for object distance.
+4. If object distance is covered. 
+- Turn straight and keep accelerating forward.
+5. Repeat from 1.
