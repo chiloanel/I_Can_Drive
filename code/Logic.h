@@ -2,9 +2,11 @@
 class Logic{
   
 public:
-
-
-private:
+Logic(){}
+void SingleFrontSensorLogic(){
+  
+  
+  }
 
   
 };
