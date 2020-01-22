@@ -4,11 +4,16 @@
 
 #define trigPin 7
 #define echoPin 6
-#define wheel = 8
-#define steering = 9
-int reverseLightPin = A5;
-int forwardLightPin = A4;
 
+
+const byte wheel = 8;
+const byte steering = 9;
+const byte reverseLightPin = A5;
+const byte forwardLightPin = A4;
+const byte interruptStartButtonPin = 2;
+
+bool state = false;
+unsigned long bounce = 0; // debouncing
 Servo myservo;  
 Servo servo;
 Car mycar;
@@ -18,36 +23,41 @@ void setup() {
 Serial.begin(9600); // starts serial communication
 pinMode(trigPin, OUTPUT);
 pinMode(echoPin, INPUT);
-
-myservo.attach(8); 
-servo.attach(9);
 pinMode(reverseLightPin, OUTPUT);
 pinMode(forwardLightPin, OUTPUT);
-delay (5000); // delay to start engine
+pinMode(interruptStartButtonPin, INPUT_PULLUP);
+myservo.attach(wheel); 
+servo.attach(steering);
+
+attachInterrupt(digitalPinToInterrupt(interruptStartButtonPin), statefunc, RISING);
+
+while(state == false){delay(10);} // wait for start button
+
 }
 
-void loop() {
+void loop (){
+
+//LOGIC CODE
 
 
-/*LOGIC CODE*/
+if(state == false) {stopfunc();}
 
 detect.transReceiveSound(trigPin,echoPin); // Send and Receive sound all the time
 
-
 if (detect.isObjectAdjacent() == true && mycar.isCarMovingForward() == true && mycar.isCarReversing() == false) //object detected while the car is moving forward
 {
- mycar.turnstraight();
- mycar.brake();
- detect.storeObjectDistance();
- mycar.turnOnLight(reverseLightPin);
+  mycar.turnstraight();
+  mycar.brake();
+  detect.storeObjectDistance();
+  mycar.turnOnLight(reverseLightPin);
+  mycar.turnOffLight(forwardLightPin);
 }
 
 else if ( (mycar.isCarNotMoving()== true  || mycar.isCarReversing() == true) && detect.isReverseComplete() == false && mycar.isCarMovingForward() == false) //object detected after car stopped or when reversing
 {
- mycar.turnleft();
- mycar.reverse();
- mycar.turnOnLight(reverseLightPin);
- mycar.turnOffLight(forwardLightPin);
+  mycar.turnleft();
+  mycar.reverse();
+  mycar.turnOnLight(reverseLightPin);
 }
 
 else if (mycar.isCarReversing() == true && detect.isReverseComplete() == true && mycar.isCarMovingForward() == false) // after reversing
@@ -57,30 +67,53 @@ else if (mycar.isCarReversing() == true && detect.isReverseComplete() == true &&
 
 else  // When there is no object
 { 
-  
-
-if (mycar.moveRight() == true && (mycar.isCarMovingForward() == true || mycar.isCarNotMoving()== true))
-{
-  mycar.turnright();
   mycar.turnOffLight(reverseLightPin);
+  mycar.turnOnLight(forwardLightPin);
+
+    if (mycar.moveRight() == true)
+    {
+      mycar.turnright();
+    }
+    else
+    {
+      mycar.turnstraight();
+    }
+
+  mycar.moveForward();
 }
-else
-{
-mycar.turnstraight();
-}
 
+//PRESENTATION
 
-mycar.moveForward();
-mycar.turnOnLight(forwardLightPin);
-}
-
-
-/*PRESENTATION*/
-
-/*long speed_ = mycar.getSpeed();
-Serial.println(speed_ , DEC);*/
+//long speed_ = mycar.getSpeed();
+//Serial.println(speed_ , DEC);
 
 servo.write(mycar.getDirection());
 myservo.write(mycar.getSpeed());
 //if (mycar.isCarNotMoving() == true) {delay(1000);}
+
+
 }
+
+void statefunc() // this function is okay
+{
+  if (millis() - bounce < 200) {return;} // Debounce
+  bounce = millis();
+  state = !state;
+}
+
+
+void stopfunc()
+{  
+  mycar.turnOffLight(reverseLightPin);
+  mycar.turnOffLight(forwardLightPin);
+  mycar.brake();
+  mycar.turnstraight();
+  servo.write(mycar.getDirection());
+  myservo.write(mycar.getSpeed());
+  
+    while(true){
+     delay(10);
+    if (state == true){loop();}
+    }  
+}
+
