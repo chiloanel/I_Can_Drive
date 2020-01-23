@@ -1,4 +1,6 @@
-ALGORITHM FOR ONE ULTRASONIC SENSOR POSITIONED AT THE FRONT OF THE CAR.
+// ALGORITHM FOR ULTRASONIC SENSOR THE CAR.
+
+/*..................Logic code for a single forward sensor............................*/
 
 1. Turn Ultrasonic Sensor on.
 2. If object is detected.
@@ -10,3 +12,12 @@ ALGORITHM FOR ONE ULTRASONIC SENSOR POSITIONED AT THE FRONT OF THE CAR.
 4. If object distance is covered. 
 - Turn straight and keep accelerating forward.
 5. Repeat from 1.
+
+
+/*.............................Start stop button......................................*/
+
+1. Set up car and button interrupt.
+2. Wait until button is pressed to start car.
+3. If button is pressed start car.
+4. If button is pressed again stop car.
+5. Repeat from 2.
