@@ -14,7 +14,7 @@ Car(){
   minForwardSpeed = 95;
   maxReverseSpeed = 107;
   minReverseSpeed = 102;
-  brakeSpeed = 100;
+  brakeSpeed = 101;
  //constants 
   reverseAcceleration = 0.5;
   forwardAcceleration = 0.1;
@@ -44,10 +44,10 @@ moveRightDistance = 0;
 } // stop the wheels
 
 
-void turnOnLight(int reverseLightPin){ // turn the LED on
+void turnOnLight(const byte &reverseLightPin){ // turn the LED on
     digitalWrite(reverseLightPin, HIGH);   
   }
-void turnOffLight(int reverseLightPin){ // turn the LED off
+void turnOffLight(const byte& reverseLightPin){ // turn the LED off
     digitalWrite(reverseLightPin, LOW);    
     }
 

@@ -2,45 +2,40 @@
 #include "Car.h"
 #include "Sensor.h"
 
-#define trigPin 7
+
 #define echoPin 6
+#define trigPin 7
 
-
-const byte wheel = 8;
-const byte steering = 9;
-const byte reverseLightPin = A5;
-const byte forwardLightPin = A4;
-const byte interruptStartButtonPin = 2;
-
-bool state = false;
-unsigned long bounce = 0; // debouncing
-Servo myservo;  
-Servo servo;
-Car mycar;
-Sensor detect;
+  const byte wheel = 8;
+  const byte steering = 9;
+  const byte reverseLightPin = A5;
+  const byte forwardLightPin = A4;
+  const byte interruptStartButtonPin = 2;
+  
+  bool state = false;
+  unsigned long bounce = 0; // debouncing
+  Servo myservo;  
+  Servo servo;
+  Car mycar;
+  Sensor detect;
 
 void setup() {
-Serial.begin(9600); // starts serial communication
-pinMode(trigPin, OUTPUT);
-pinMode(echoPin, INPUT);
-pinMode(reverseLightPin, OUTPUT);
-pinMode(forwardLightPin, OUTPUT);
-pinMode(interruptStartButtonPin, INPUT_PULLUP);
-myservo.attach(wheel); 
-servo.attach(steering);
-
-attachInterrupt(digitalPinToInterrupt(interruptStartButtonPin), statefunc, RISING);
-
-while(state == false){delay(10);} // wait for start button
-
+  Serial.begin(9600); // starts serial communication
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(reverseLightPin, OUTPUT);
+  pinMode(forwardLightPin, OUTPUT);
+  pinMode(interruptStartButtonPin, INPUT_PULLUP);
+  myservo.attach(wheel); 
+  servo.attach(steering);
+  
+  attachInterrupt(digitalPinToInterrupt(interruptStartButtonPin), statefunc, RISING);
+  waitUntilStart(); // wait for start button
 }
 
 void loop (){
 
 //LOGIC CODE
-
-
-if(state == false) {stopfunc();}
 
 detect.transReceiveSound(trigPin,echoPin); // Send and Receive sound all the time
 
@@ -83,14 +78,13 @@ else  // When there is no object
 }
 
 //PRESENTATION
-
 //long speed_ = mycar.getSpeed();
 //Serial.println(speed_ , DEC);
 
 servo.write(mycar.getDirection());
 myservo.write(mycar.getSpeed());
-//if (mycar.isCarNotMoving() == true) {delay(1000);}
 
+if(state == false) {stopfunc();}
 
 }
 
@@ -98,6 +92,7 @@ void statefunc() // this function is okay
 {
   if (millis() - bounce < 200) {return;} // Debounce
   bounce = millis();
+  
   state = !state;
 }
 
@@ -110,10 +105,12 @@ void stopfunc()
   mycar.turnstraight();
   servo.write(mycar.getDirection());
   myservo.write(mycar.getSpeed());
-  
-    while(true){
-     delay(10);
-    if (state == true){loop();}
-    }  
+
+  waitUntilStart();
 }
+
+
+void waitUntilStart(){
+ while(state == false){delay(10);} // wait for start button
+} 
 
