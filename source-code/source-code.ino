@@ -9,11 +9,13 @@
 
   
   bool state = false;
-  int state_ = 0;
   unsigned long bounce = 0; // debouncing
   Servo myservo;  
   Servo servo;
   Car mycar;
+
+  String bluetoothValue = "";
+  int  bluetoothValueInt = 0;
 
 void setup() {
   Serial.begin(9600); // starts serial communication
@@ -30,47 +32,54 @@ void setup() {
 void loop (){
 
  if(Serial.available() > 0){ // Checks whether data is comming from the serial port
-    state_ = Serial.read(); // Reads the data from the serial port
+  
+    bluetoothValue = Serial.readString(); // Reads the data from the serial port
  }
 
 
 // DIRECTION
- if (state_ == 30) { // left
+ if (bluetoothValue == "LEFT") { // left
  mycar.turnleft();
  }
  
- else if (state_ == 35) { // straight
+ else if (bluetoothValue == "STRAIGHT") { // straight
   mycar.turnstraight();
  } 
- else if (state == 40){ // right
+ else if (bluetoothValue == "RIGHT"){ // right
   mycar.turnright();
  }
 
 // MOTION 
- else if (state_ == 10) { // forward
-  mycar.moveForward();
+ else if (bluetoothValue == "FORWARD") { // forward
+  mycar.setForward();
   mycar.turnOnLight(forwardLightPin);
   mycar.turnOffLight(reverseLightPin);
  }
  
- else if (state_ == 20) { // reverse
-  mycar.reverse();
+ else if (bluetoothValue == "REVERSE") { // reverse
+  mycar.setReverse();
   mycar.turnOnLight(reverseLightPin);
   mycar.turnOffLight(forwardLightPin);
  } 
  
- else if (state == 15){ // brake
+ else if (bluetoothValue == "BRAKE"){ // brake
  mycar.brake();
  mycar.turnOffLight(forwardLightPin);
- state_ = 0;
+ bluetoothValue = "";
  }
 
- else if (state == 5){ // stop increasing speed
- state_ = 0;
- }
+bluetoothValueInt = bluetoothValue.toInt();
+if (bluetoothValueInt >= 0 && bluetoothValueInt <= 100 && mycar.isCarNotMoving() == false) {
+    
+ if (mycar.isCarMovingForward() == true) {mycar.accelerateForward(bluetoothValueInt);}
+ else if (mycar.isCarReversing() == true) {mycar.accelerateReverse(bluetoothValueInt);}
 
-servo.write(mycar.getDirection());
-myservo.write(mycar.getSpeed());
+}
+
+servo.write(mycar.getDirection()); // print direction
+myservo.write(mycar.getSpeed()); // print speed
+
+
 
 if(state == false) {stopfunc();}
 
