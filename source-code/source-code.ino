@@ -14,8 +14,9 @@
   Servo servo;
   Car mycar;
 
-  String bluetoothValue = "";
-  int  bluetoothValueInt = 0;
+  int bluetoothValue = 0;
+  String bluetoothValueString = "";
+  int bluetoothValueInt = 0;
 
 void setup() {
   Serial.begin(9600); // starts serial communication
@@ -32,52 +33,63 @@ void setup() {
 void loop (){
 
  if(Serial.available() > 0){ // Checks whether data is comming from the serial port
-  
-    bluetoothValue = Serial.readString(); // Reads the data from the serial port
+
+bluetoothValue =  Serial.read();
+
+//Serial.println(bluetoothValue);
+//Serial.println('/n');  
+   
  }
+
+
 
 
 // DIRECTION
- if (bluetoothValue == "LEFT") { // left
+ if (bluetoothValue == 'L') { // left
  mycar.turnleft();
  }
  
- else if (bluetoothValue == "STRAIGHT") { // straight
+ else if (bluetoothValue == 'S') { // straight
   mycar.turnstraight();
  } 
- else if (bluetoothValue == "RIGHT"){ // right
+ else if (bluetoothValue == 'R'){ // right
   mycar.turnright();
  }
 
 // MOTION 
- else if (bluetoothValue == "FORWARD") { // forward
+ else if (bluetoothValue == 'F') { // forward
   mycar.setForward();
   mycar.turnOnLight(forwardLightPin);
   mycar.turnOffLight(reverseLightPin);
  }
  
- else if (bluetoothValue == "REVERSE") { // reverse
+ else if (bluetoothValue == 'r') { // Back or reverse
   mycar.setReverse();
   mycar.turnOnLight(reverseLightPin);
   mycar.turnOffLight(forwardLightPin);
  } 
  
- else if (bluetoothValue == "BRAKE"){ // brake
+ else if (bluetoothValue == 'B'){ // brake
  mycar.brake();
  mycar.turnOffLight(forwardLightPin);
- bluetoothValue = "";
+ bluetoothValue = 0;
  }
 
-bluetoothValueInt = bluetoothValue.toInt();
-if (bluetoothValueInt >= 0 && bluetoothValueInt <= 100 && mycar.isCarNotMoving() == false) {
+//bluetoothValueInt = bluetoothValueString.toInt();
+if (bluetoothValue >= 150 && bluetoothValue <= 250 && mycar.isCarNotMoving() == false) {
     
- if (mycar.isCarMovingForward() == true) {mycar.accelerateForward(bluetoothValueInt);}
- else if (mycar.isCarReversing() == true) {mycar.accelerateReverse(bluetoothValueInt);}
+ if (mycar.isCarMovingForward() == true) {mycar.accelerateForward(bluetoothValue);}
+ else if (mycar.isCarReversing() == true) {mycar.accelerateReverse(bluetoothValue);}
 
 }
 
+
 servo.write(mycar.getDirection()); // print direction
-myservo.write(mycar.getSpeed()); // print speed
+
+if ( bluetoothValue != 'R' || bluetoothValue != 'L' || bluetoothValue != 'S')
+
+{ myservo.write(mycar.getSpeed()); // print speed
+}
 
 
 
